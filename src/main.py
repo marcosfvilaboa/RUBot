@@ -10,12 +10,7 @@ from fileProcessing.JSONFile import JSONFile
 from fileProcessing.CSVFile import CSVFile
 from dateutil import parser
 import sys
-def myprint(d):
-    for k, v in d.iteritems():
-        if isinstance(v, dict):
-            myprint(v)
-        else:
-            print('{0} : {1}'.format(k, v))
+from datetime import datetime
       
 if __name__ == '__main__':
     
@@ -23,11 +18,25 @@ if __name__ == '__main__':
     filePathOut = '../data/' + sys.argv[2]
     fileReader = JSONFile()
     fileWriter = CSVFile()
+####### Trying to operate with dates
+    date1 = 'Wed Mar 07 23:03:14 +0000 2018'
+    date2 = 'Wed Mar 07 23:04:14 +0000 2018'
+    date3 = 'Wed Mar 07 23:03:14 +0000 2018'
+    date4 = 'Thu Mar 08 23:05:55 +0000 2018'
+    parsed_date1 = parser.parse(date1) 
+    parsed_date2 = parser.parse(date2)  
+    parsed_date3 = parser.parse(date3) 
+    parsed_date4 = parser.parse(date4)  
+    # Second parsed date has to be later than first 
+    parsed_dateA = parsed_date2 - parsed_date1
+    parsed_dateB = parsed_date4 - parsed_date3
+    parsed_date = list()
     
-    date = 'Wed Mar 07 23:04:55 +0000 2018'
-    parsed_date = parser.parse(date)
+    parsed_date.append(parsed_dateB.total_seconds())
+    parsed_date.append(parsed_dateA.total_seconds())
     
-    
+    parsed_date.sort()
+#######
     conversationList = fileReader.readJson(filePathIn)
     conversationsNum = 0
     tweetsNum = 0
@@ -55,9 +64,9 @@ if __name__ == '__main__':
             if tweets['user']['screen_name'] not in screenNames:                
                 screenNames.append(tweets['user']['screen_name'])
                 userDetailsList.append(tweets['user'])
-    
+    print("Date parsed: {0}".format(parsed_date))
     print("Number of conversations in file: {0}".format(conversationsNum))
-    print("Number of tweet data (retweets): {0}".format(tweetsNum))
+    print("Number of tweet data: {0}".format(tweetsNum))
     print("Number of diferent users who twited: {0}".format(len(screenNames)))
     print("Number of authors of tweets retweeted: {0}".format(len(tweetAuthors)))
     print("Sample of 10 users who retweeted: {0}".format(screenNames[0:10])) 
@@ -65,4 +74,5 @@ if __name__ == '__main__':
     print("Details of user '{0}': {1}".format(userDetailsList[10]['screen_name'], userDetailsList[10]))
     
     # import data of the dictionaries list of users details to csv
-    fileWriter.writeCSV(filePathOut,userDetailsList)
+    #fileWriter.writeCSV(filePathOut,userDetailsList)
+    
