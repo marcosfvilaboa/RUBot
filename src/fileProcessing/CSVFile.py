@@ -7,7 +7,7 @@ Project:     RUBot: humano o bot
                                                     Created on 11 abr. 2018            
 '''
 import csv
-class CSVFile(object):
+class CSVFile:
     '''
     classdocs
     '''
