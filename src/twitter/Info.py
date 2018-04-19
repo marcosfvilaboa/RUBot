@@ -77,6 +77,8 @@ class Info(dict):
                 else:
                     self.uploadUserRetweetInfo(twt,twtLst)
             else:
+            # if its not a retweet
+            # for now not implemented because the JSON example file seems not to have them
                 if not self.idInTweetList(twt, twtLst):
                     twtMap = self.addNewRetweet(twt)
                     twtLst.append(twtMap)     

@@ -11,32 +11,35 @@ from fileProcessing.CSVFile import CSVFile
 from twitter.Info import Info
 
 import sys
-
+import time
    
 
 if __name__ == '__main__':
-    
+    start_time = time.time()
+
     filePathIn = '../data/' + sys.argv[1]
     twtsCSV = '../data/results/' + sys.argv[2]
+    usersCSV = '../data/results/' + sys.argv[3]
     fileReader = JSONFile()
     fileWriter = CSVFile()
 
     conversationList = fileReader.readJson(filePathIn)
     conversationsNum = 0
     tweetList = list()
+    userList = list()
     
     for conversation in conversationList:
         conversationsNum += 1
         for tweet in conversation:
             Info().addTweetInfoToList(tweet, tweetList)
+            userList.append(tweet['user'])
             
-    
+    # import data of the dictionaries list of users details to csv
+    fileWriter.writeCSV(twtsCSV,tweetList)
+    fileWriter.writeCSV(usersCSV,userList)
     print("Number of conversations in file: {0}".format(conversationsNum))    
     print("Number of retweet data: {0}".format(len(tweetList)))
     print("Details of tweet '{0}' by {1} in 'tweetList': {2}".format(tweetList[5]['id'], tweetList[5]['screen_name'], tweetList[5]))
     print("3 tweets selected from 'tweetList' : {0}".format(tweetList[12:15]))
-    
-    # import data of the dictionaries list of users details to csv
-    fileWriter.writeCSV(twtsCSV,tweetList)
-    
+    print("--- %s seconds ---" % round((time.time() - start_time)), 2)
     
