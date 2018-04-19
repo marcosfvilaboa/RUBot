@@ -8,70 +8,60 @@ Project:     RUBot: humano o bot
 '''
 from fileProcessing.JSONFile import JSONFile
 from fileProcessing.CSVFile import CSVFile
-from twitter.ParsedDate import ParsedDate
+from twitter.Info import Info
 
 import sys
-      
+
+def addTweetInfoToLists(twt, twtLst, iTwtLst):  
+    
+    try:
+        # Catch info from original tweet if its a retweet        
+        if twt['retweeted_status']:
+            if not Info().idInTweetList(twt['id'], iTwtLst):
+                retwtMap = Info().addRetweetInfoToRetweetMap(twt)
+                iTwtLst.append(retwtMap)      
+        #catch normal tweet instead
+        else:
+            if not Info().idInTweetList(twt['id'], twtLst):        
+                # add tweet details to tweet map
+                twtMap = Info().addTweetInfoToTweetMap(twt)
+                twtLst.append(twtMap)
+    except KeyError:
+        # Key is not present
+        pass    
+
 if __name__ == '__main__':
     
     filePathIn = '../data/' + sys.argv[1]
     userCSV = '../data/results/' + sys.argv[2]
+    twtsCSV = '../data/results/' + sys.argv[3]
+    retwtsCSV = '../data/results/' + sys.argv[4]
     fileReader = JSONFile()
     fileWriter = CSVFile()
-    
-####### Trying to operate with dates
 
-    date1 = 'Wed Mar 07 23:03:14 +0000 2018'
-    date2 = 'Wed Mar 07 23:04:14 +0000 2018'
-    date3 = 'Thu Mar 08 23:05:55 +0000 2018' 
-    parsed_dates = list()
-    
-    parsed_dates.append(ParsedDate().substractStringDates(date1, date2))
-    parsed_dates.append(ParsedDate().substractStringDates(date3, date3))
-    parsed_dates.append(ParsedDate().substractStringDates(date3, date1))
-    parsed_dates.append(ParsedDate().substractStringDates(date2, date3))
-    
-    #parsed_dates.sort()
-    
-#######
     conversationList = fileReader.readJson(filePathIn)
     conversationsNum = 0
-    tweetsNum = 0
-    mentionsNum = 0
+    userList = list()
+    tweetList = list()
+    interactionsTwtList = list()
     
-    idList = list()
-    userDetailsList = list()
-    
-    tweetTexts = list()
-    tweetAuthors = list()
     for conversation in conversationList:
         conversationsNum += 1
-        for tweets in conversation:
-            tweetsNum += 1
-            try:
-                # Catch users of original tweet
-                if tweets['retweeted_status']:
-                    if tweets['retweeted_status']['user']['screen_name'] not in tweetAuthors:
-                        tweetTexts.append({tweets['retweeted_status']['user']['screen_name'] : tweets['retweeted_status']['text']})
-                        tweetAuthors.append(tweets['retweeted_status']['user']['screen_name'])
-            except KeyError:
-                # Key is not present
-                pass
-            # Catch users
-            if tweets['user']['id'] not in idList:                
-                idList.append(tweets['user']['id'])
-                userDetailsList.append(tweets['user'])
+        for tweet in conversation:
+            addTweetInfoToLists(tweet, tweetList, interactionsTwtList)
+            
     
-    print("Date parsed: {0}".format(parsed_dates))
     print("Number of conversations in file: {0}".format(conversationsNum))
-    print("Number of tweet data: {0}".format(tweetsNum))
-    print("Number of diferent users who twited: {0}".format(len(idList)))
-    print("Number of authors of tweets retweeted: {0}".format(len(tweetAuthors)))
-    print("Sample of 10 users who retweeted: {0}".format(idList[0:10])) 
-    print("Sample of 5 retweeted tweets and its author username {0}".format(tweetTexts[0:5]))
-    print("Details of user '{0}': {1}".format(userDetailsList[10]['screen_name'], userDetailsList[10]))
+#     print("Number of tweet data: {0}".format(len(tweetList)))    
+#     print("Details of tweet '{0}' by {1} in 'tweetList': {2}".format(tweetList[5]['id'], tweetList[5]['user']['screen_name'], tweetList[5]))
+#     print("3 tweets selected from 'tweetList' : {0}".format(tweetList[12:15]))
+    
+    print("Number of retweet data: {0}".format(len(interactionsTwtList)))
+    print("Details of tweet '{0}' by {1} in 'tweetList': {2}".format(interactionsTwtList[5]['id'], interactionsTwtList[5]['user_screen_name'], interactionsTwtList[5]))
+    print("3 tweets selected from 'interactionsTwtList' : {0}".format(interactionsTwtList[12:15]))
     
     # import data of the dictionaries list of users details to csv
-    fileWriter.writeCSV(userCSV,userDetailsList)
+    #fileWriter.writeCSV(twtsCSV,tweetList)
+    fileWriter.writeCSV(retwtsCSV,interactionsTwtList)
     
     
