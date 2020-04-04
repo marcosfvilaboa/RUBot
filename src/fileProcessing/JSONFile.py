@@ -28,3 +28,8 @@ class JSONFile:
             jsonTree = json.load(self.fileObj)
             contentList = jsonTree['content']
         return contentList
+    
+    def writeJSON(self, data, filePath):
+        
+        with open(filePath, 'w', encoding='utf8') as output: 
+            json.dump(data, output)

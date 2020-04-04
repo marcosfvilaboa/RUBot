@@ -38,6 +38,9 @@ class Calcs:
     def digitsInString(self, strToParse):
         return sum(char.isdigit() for char in strToParse)
     
-    def calcPercentage(self, X, Y):
-        return Y*100/X
+    def calcPercentage(self, X):
+        if (X == 0):
+            return 0
+        else:
+            return (1-(1/X))
     

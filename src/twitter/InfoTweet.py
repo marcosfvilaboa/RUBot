@@ -8,7 +8,7 @@ Project:     RUBot: humano o bot
 '''
 from utils.Calcs import Calcs
 
-class Info(dict):
+class InfoTweet(dict):
     '''
     classdocs
     '''
